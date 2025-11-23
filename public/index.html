@@ -12,10 +12,27 @@
 
     <style>
         body { margin:0; overflow:hidden; font-family: system-ui; }
+
+        /* DEBUG BOX (green/red marker detection status) */
+        #debugStatus {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: red;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 999;
+        }
     </style>
 </head>
 
 <body>
+
+<!-- DEBUG INDICATOR -->
+<div id="debugStatus">❌ Marker NOT detected</div>
 
 <a-scene
         embedded
@@ -28,11 +45,11 @@
     <a-entity light="type: ambient; intensity: 1"></a-entity>
     <a-entity light="type: directional; intensity: 0.9" position="1 1 1"></a-entity>
 
-    <!-- NFT Marker -->
+    <!-- NFT Marker using your uploaded files -->
     <a-nft
             id="nyanMarker"
             type="nft"
-            url="./nyan">
+            url="./nyan-marker/nyan">
 
         <!-- Nyan Cat Image -->
         <a-plane
@@ -44,7 +61,7 @@
                 material="src: url(./nyan.png); transparent: true; opacity: 1;">
         </a-plane>
 
-        <!-- Rainbow trail -->
+        <!-- Rainbow Trail -->
         <a-box id="rainbow" visible="false"
                width="1.5"
                height="0.15"
@@ -54,7 +71,7 @@
                animation="property: position; to: 0 0.2 -0.5; loop: true; dur: 1200; dir: alternate">
         </a-box>
 
-        <!-- Floating text -->
+        <!-- Floating Text -->
         <a-text id="text"
                 value="✨ Scan Nyan Cat!"
                 color="#ffffff"
@@ -76,19 +93,32 @@
     const nyanCard = document.getElementById("nyanCard");
     const rainbow = document.getElementById("rainbow");
     const text = document.getElementById("text");
+    const debugBox = document.getElementById("debugStatus");
 
     let visible = false;
     let clicked = false;
 
+    // 🔍 DEBUG — SEE WHEN MARKER IS FOUND
     marker.addEventListener('markerFound', () => {
+        console.log("FOUND");
         visible = true;
+
+        debugBox.style.background = "green";
+        debugBox.textContent = "✅ Marker detected!";
+
         text.setAttribute("value", "🌈 Nyan Cat Appears! Tap the screen ✨");
     });
 
+    // 🔍 DEBUG — SEE WHEN MARKER IS LOST
     marker.addEventListener('markerLost', () => {
+        console.log("LOST");
         visible = false;
+
+        debugBox.style.background = "red";
+        debugBox.textContent = "❌ Marker NOT detected";
     });
 
+    // Tap interaction
     document.body.addEventListener('click', () => {
         if (!visible) return;
 

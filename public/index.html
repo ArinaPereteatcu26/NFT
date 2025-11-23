@@ -3,109 +3,96 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AR.js NFT Test</title>
-    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <title>Nyan Cat AR Adventure</title>
+
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+    <!-- AR.js NFT -->
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar-nft.js"></script>
 
     <style>
+        body { margin: 0; overflow: hidden; }
+
         .arjs-loader {
             height: 100%;
             width: 100%;
             position: absolute;
-            top: 0;
-            left: 0;
-            background-color: rgba(0, 0, 0, 0.8);
+            top: 0; left: 0;
+            background: rgba(0, 0, 0, 0.85);
             z-index: 9999;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-
         .arjs-loader div {
-            text-align: center;
-            font-size: 1.25em;
             color: white;
+            font-size: 1.4em;
+            font-family: sans-serif;
         }
 
         #storyBox {
             position: fixed;
-            top: 20px;
-            left: 50%;
+            top: 20px; left: 50%;
             transform: translateX(-50%);
+            background: rgba(0,0,0,0.75);
             padding: 15px 25px;
-            background: rgba(0, 0, 0, 0.8);
             color: white;
-            border-radius: 15px;
             font-family: Arial, sans-serif;
-            font-size: 16px;
+            border-radius: 15px;
             text-align: center;
-            max-width: 80%;
+            max-width: 85%;
+            font-size: 16px;
             z-index: 9999;
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity .5s ease;
         }
-
-        #storyBox.visible {
-            opacity: 1;
-        }
+        #storyBox.visible { opacity: 1; }
 
         #tapHint {
             position: fixed;
-            bottom: 30px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
+            background: rgba(255,255,255,0.9);
             padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
             border-radius: 20px;
-            font-family: Arial, sans-serif;
+            color: #222;
+            font-family: Arial;
             font-size: 14px;
-            z-index: 9999;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            z-index: 9999;
+            transition: opacity .3s ease;
         }
-
-        #tapHint.visible {
-            opacity: 1;
-        }
+        #tapHint.visible { opacity: 1; }
 
         #stepIndicator {
             position: fixed;
-            top: 80px;
+            top: 75px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             gap: 8px;
-            z-index: 9999;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            z-index: 9999;
+            transition: opacity .3s ease;
         }
-
-        #stepIndicator.visible {
-            opacity: 1;
-        }
+        #stepIndicator.visible { opacity: 1; }
 
         .step-dot {
-            width: 10px;
-            height: 10px;
+            width: 12px; height: 12px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            transition: background 0.3s ease;
+            background: rgba(255,255,255,0.3);
+            transition: background .3s ease;
         }
-
-        .step-dot.active {
-            background: #00ff88;
-        }
+        .step-dot.active { background: #00ff88; }
     </style>
 </head>
 
-<body style="margin: 0px; overflow: hidden;">
-<!-- minimal loader shown until image descriptors are loaded -->
-<div class="arjs-loader">
-    <div>Loading, please wait...</div>
-</div>
+<body>
 
-<!-- Story UI -->
+<div class="arjs-loader"><div>Loading AR Scene…</div></div>
+
 <div id="storyBox"></div>
 <div id="stepIndicator">
     <div class="step-dot"></div>
@@ -117,153 +104,166 @@
 <div id="tapHint">Tap to continue</div>
 
 <a-scene
-        vr-mode-ui="enabled: false;"
-        renderer="logarithmicDepthBuffer: true;"
         embedded
-        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+        vr-mode-ui="enabled:false"
+        renderer="logarithmicDepthBuffer:true;"
+        arjs="trackingMethod:best; sourceType:webcam; debugUIEnabled:false;"
 >
     <a-assets>
-        <img id="nyanImg" src="./nyan.png" crossorigin="anonymous">
+        <img id="nyanImg" src="./nyan.png">
     </a-assets>
 
+    <!-- NFT MARKER -->
     <a-nft
             type="nft"
             url="./nyan-marker/nyan"
             smooth="true"
             smoothCount="10"
-            smoothTolerance=".01"
+            smoothTolerance="0.01"
             smoothThreshold="5"
     >
-        <!-- Step 1: Nyan Cat image -->
-        <a-entity id="step1" visible="true">
-            <a-image
-                    src="#nyanImg"
-                    position="50 150 0"
-                    rotation="-90 0 0"
-                    scale="100 100 100"
-            ></a-image>
-        </a-entity>
-        <!-- Step 2: Rainbow with spinning torus -->
-        <a-entity id="step2" visible="false">
-            <a-box position="0 100 0" width="20" height="10" depth="150" color="#FF0000" rotation="-90 0 0"></a-box>
-            <a-box position="0 100 15" width="20" height="10" depth="150" color="#FF7F00" rotation="-90 0 0"></a-box>
-            <a-box position="0 100 30" width="20" height="10" depth="150" color="#FFFF00" rotation="-90 0 0"></a-box>
-            <a-box position="0 100 45" width="20" height="10" depth="150" color="#00FF00" rotation="-90 0 0"></a-box>
-            <a-box position="0 100 60" width="20" height="10" depth="150" color="#0000FF" rotation="-90 0 0"></a-box>
-            <a-box position="0 100 75" width="20" height="10" depth="150" color="#8B00FF" rotation="-90 0 0"></a-box>
-            <a-torus position="100 150 40" radius="40" radius-tubular="8" color="#FF69B4"
-                     animation="property: rotation; to: 360 360 0; loop: true; dur: 3000; easing: linear">
-            </a-torus>
-        </a-entity>
-
-        <!-- Step 3: Space scene with planet -->
-        <a-entity id="step3" visible="false">
-            <a-sphere position="50 150 0" radius="60" color="#4169E1"
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear">
-            </a-sphere>
-            <a-torus position="50 150 0" radius="90" radius-tubular="5" color="#FFD700" rotation="60 0 0"
-                     animation="property: rotation; from: 60 0 0; to: 60 360 0; loop: true; dur: 6000; easing: linear">
-            </a-torus>
-            <a-sphere position="120 180 30" radius="15" color="#FFFFFF"></a-sphere>
-            <a-sphere position="-20 120 -20" radius="10" color="#FFA500"></a-sphere>
-        </a-entity>
-
-        <!-- Step 4: Celebration with fireworks -->
-        <a-entity id="step4" visible="false">
-            <a-image
-                    src="#nyanImg"
-                    position="50 150 0"
-                    rotation="-90 0 0"
-                    scale="120 120 120"
-                    animation="property: rotation; from: -90 -5 0; to: -90 5 0; loop: true; dur: 300; dir: alternate">
+        <!-- STEP 1: Nyan Cat appears -->
+        <a-entity id="step1" visible="false">
+            <a-image src="#nyanImg"
+                     position="50 120 0"
+                     rotation="-90 0 0"
+                     scale="90 90 90">
             </a-image>
-            <a-sphere position="120 200 30" radius="15" color="#FF0080"
-                      animation="property: scale; from: 0.5 0.5 0.5; to: 1.5 1.5 1.5; loop: true; dur: 500; dir: alternate"></a-sphere>
-            <a-sphere position="-20 180 40" radius="12" color="#00FFFF"
-                      animation="property: scale; from: 0.5 0.5 0.5; to: 1.5 1.5 1.5; loop: true; dur: 600; dir: alternate"></a-sphere>
-            <a-sphere position="80 220 -20" radius="18" color="#FFFF00"
-                      animation="property: scale; from: 0.5 0.5 0.5; to: 1.5 1.5 1.5; loop: true; dur: 400; dir: alternate"></a-sphere>
-            <a-sphere position="20 200 50" radius="10" color="#00FF00"
-                      animation="property: scale; from: 0.5 0.5 0.5; to: 1.5 1.5 1.5; loop: true; dur: 550; dir: alternate"></a-sphere>
         </a-entity>
+
+        <!-- STEP 2: Rainbow & spinning torus -->
+        <a-entity id="step2" visible="false">
+            <a-box color="#FF0000" width="20" height="10" depth="150"
+                   position="0 120 0" rotation="-90 0 0"></a-box>
+            <a-box color="#FF7F00" width="20" height="10" depth="150"
+                   position="0 120 15" rotation="-90 0 0"></a-box>
+            <a-box color="#FFFF00" width="20" height="10" depth="150"
+                   position="0 120 30" rotation="-90 0 0"></a-box>
+            <a-box color="#00FF00" width="20" height="10" depth="150"
+                   position="0 120 45" rotation="-90 0 0"></a-box>
+            <a-box color="#0000FF" width="20" height="10" depth="150"
+                   position="0 120 60" rotation="-90 0 0"></a-box>
+            <a-box color="#8B00FF" width="20" height="10" depth="150"
+                   position="0 120 75" rotation="-90 0 0"></a-box>
+
+            <a-torus color="#FF69B4"
+                     radius="50" radius-tubular="8"
+                     position="80 150 40"
+                     animation="property:rotation; to:360 360 0; loop:true; dur:3000;">
+            </a-torus>
+        </a-entity>
+
+        <!-- STEP 3: Planet, ring, space objects -->
+        <a-entity id="step3" visible="false">
+            <a-sphere radius="55" color="#3A6EFF"
+                      position="50 130 0"
+                      animation="property:rotation; to:0 360 0; loop:true; dur:7000;">
+            </a-sphere>
+
+            <a-torus radius="85" radius-tubular="4"
+                     color="#FEE77A"
+                     rotation="60 0 0"
+                     position="50 130 0"
+                     animation="property:rotation; to:60 360 0; loop:true; dur:5000;">
+            </a-torus>
+
+            <a-sphere radius="12" position="-20 150 20" color="#FFD700"></a-sphere>
+            <a-sphere radius="10" position="120 160 -10" color="#FFFFFF"></a-sphere>
+        </a-entity>
+
+        <!-- STEP 4: Celebration — fireworks + bouncing Nyan -->
+        <a-entity id="step4" visible="false">
+            <a-image src="#nyanImg"
+                     position="50 140 0"
+                     rotation="-90 0 0"
+                     scale="110 110 110"
+                     animation="property:rotation; dir:alternate; from:-90 -5 0; to:-90 5 0; dur:300; loop:true;">
+            </a-image>
+
+            <a-sphere color="#FF00AA" radius="14" position="100 190 30"
+                      animation="property:scale; dir:alternate; from:0.5 0.5 0.5; to:1.4 1.4 1.4; loop:true; dur:500;">
+            </a-sphere>
+            <a-sphere color="#00FFFF" radius="12" position="-30 170 40"
+                      animation="property:scale; dir:alternate; from:0.5 0.5 0.5; to:1.4 1.4 1.4; loop:true; dur:600;">
+            </a-sphere>
+            <a-sphere color="#FFFF00" radius="16" position="50 200 -20"
+                      animation="property:scale; dir:alternate; from:0.5 0.5 0.5; to:1.8 1.8 1.8; loop:true; dur:450;">
+            </a-sphere>
+        </a-entity>
+
     </a-nft>
 
     <a-entity camera></a-entity>
 </a-scene>
 
 <script>
+    // Story script text
     const storySteps = [
-        "Welcome! Point your camera at the image...",
-        "Nyan Cat awakens from the digital realm!",
-        "Flying through space on a rainbow trail...",
-        "A mysterious planet appears in the cosmos...",
-        "Celebration time! Thanks for the journey!"
+        "Scan the image to begin the adventure...",
+        "✨ Nyan Cat awakens from the cosmic void!",
+        "🌈 Riding a rainbow between worlds...",
+        "🪐 A mysterious planet appears in deep space...",
+        "🎉 Celebration! Nyan thanks you for journeying together!"
     ];
 
     let currentStep = 0;
     let markerFound = false;
 
-    const storyBox = document.getElementById('storyBox');
-    const stepIndicator = document.getElementById('stepIndicator');
-    const tapHint = document.getElementById('tapHint');
-    const dots = document.querySelectorAll('.step-dot');
+    const storyBox = document.getElementById("storyBox");
+    const tapHint = document.getElementById("tapHint");
+    const stepIndicator = document.getElementById("stepIndicator");
+    const dots = document.querySelectorAll(".step-dot");
 
     const stepEntities = [
-        null, // step 0 has no 3D content
-        document.getElementById('step1'),
-        document.getElementById('step2'),
-        document.getElementById('step3'),
-        document.getElementById('step4')
+        null,
+        document.getElementById("step1"),
+        document.getElementById("step2"),
+        document.getElementById("step3"),
+        document.getElementById("step4")
     ];
 
-    function showStep(index) {
-        if (index >= storySteps.length) return;
+    function showStep(i) {
+        currentStep = i;
+        storyBox.textContent = storySteps[i];
+        storyBox.classList.add("visible");
+        stepIndicator.classList.add("visible");
 
-        currentStep = index;
-        storyBox.textContent = storySteps[index];
-        storyBox.classList.add('visible');
-        stepIndicator.classList.add('visible');
+        // highlight dots
+        dots.forEach((d, x) => d.classList.toggle("active", x <= i));
 
-        // Update dots
-        dots.forEach((dot, i) => {
-            dot.classList.toggle('active', i <= index);
-        });
-// Show/hide 3D entities
-        stepEntities.forEach((entity, i) => {
-            if (entity) {
-                entity.setAttribute('visible', i === index);
-            }
+        // show/hide 3D objects
+        stepEntities.forEach((ent, idx) => {
+            if (ent) ent.setAttribute("visible", idx === i);
         });
 
-        if (index < storySteps.length - 1) {
-            setTimeout(() => tapHint.classList.add('visible'), 1500);
+        if (i < storySteps.length - 1) {
+            tapHint.classList.add("visible");
         } else {
-            tapHint.classList.remove('visible');
+            tapHint.classList.remove("visible");
         }
     }
 
+    // Advance story
     function nextStep() {
         if (currentStep < storySteps.length - 1) {
-            tapHint.classList.remove('visible');
+            tapHint.classList.remove("visible");
             showStep(currentStep + 1);
         }
     }
 
-    // Start story when marker is found
-    document.querySelector('a-nft').addEventListener('markerFound', () => {
+    // Marker detection
+    document.querySelector("a-nft").addEventListener("markerFound", () => {
         if (!markerFound) {
             markerFound = true;
-            showStep(0);
-            setTimeout(() => showStep(1), 2000);
+            showStep(1);
         }
     });
 
-    // Tap to advance story
-    document.body.addEventListener('click', () => {
-        if (markerFound && currentStep >= 1) {
-            nextStep();
-        }
+    // Tap to continue
+    document.body.addEventListener("click", () => {
+        if (markerFound && currentStep >= 1) nextStep();
     });
 </script>
+
 </body>
 </html>

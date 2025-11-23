@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Nyan Cat AR NFT Experience</title>
+    <title>Ape AR NFT Experience</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
     <!-- A-Frame -->
@@ -13,7 +13,6 @@
     <style>
         body { margin:0; overflow:hidden; font-family: system-ui; }
 
-        /* DEBUG BOX (green/red marker detection status) */
         #debugStatus {
             position: fixed;
             bottom: 10px;
@@ -31,7 +30,6 @@
 
 <body>
 
-<!-- DEBUG INDICATOR -->
 <div id="debugStatus">❌ Marker NOT detected</div>
 
 <a-scene
@@ -41,39 +39,26 @@
         arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false"
 >
 
-    <!-- Lights -->
     <a-entity light="type: ambient; intensity: 1"></a-entity>
     <a-entity light="type: directional; intensity: 0.9" position="1 1 1"></a-entity>
 
-    <!-- NFT Marker using your uploaded files -->
+    <!-- NFT marker for the ape -->
     <a-nft
-            id="nyanMarker"
+            id="apeMarker"
             type="nft"
-            url="./nyan-marker/nyan">
+            url="./ape-marker/ape">
 
-        <!-- Nyan Cat Image -->
         <a-plane
-                id="nyanCard"
+                id="apeCard"
                 position="0 0 0"
                 rotation="-90 0 0"
                 width="1.2"
                 height="1.2"
-                material="src: url(./nyan.png); transparent: true; opacity: 1;">
+                material="src: url(./ape.jpeg); transparent: true; opacity: 1;">
         </a-plane>
 
-        <!-- Rainbow Trail -->
-        <a-box id="rainbow" visible="false"
-               width="1.5"
-               height="0.15"
-               depth="0.15"
-               position="0 0.2 0.2"
-               material="color: #ff66ff; emissive: #ff33ff; opacity: 0.7; transparent: true"
-               animation="property: position; to: 0 0.2 -0.5; loop: true; dur: 1200; dir: alternate">
-        </a-box>
-
-        <!-- Floating Text -->
         <a-text id="text"
-                value="✨ Scan Nyan Cat!"
+                value="✨ Scan the Ape NFT!"
                 color="#ffffff"
                 align="center"
                 width="2"
@@ -81,54 +66,55 @@
                 rotation="-90 0 0">
         </a-text>
 
+        <a-sphere id="ball"
+                  visible="false"
+                  radius="0.15"
+                  position="0 0.5 0.2"
+                  material="color: #ff0066; emissive: #ff3385; transparent: true; opacity: 0.9"
+                  animation="property: position; to: 0 0.9 0.2; dir: alternate; loop: true; dur: 1000">
+        </a-sphere>
+
     </a-nft>
 
-    <!-- Camera -->
     <a-entity camera></a-entity>
 
 </a-scene>
 
 <script>
-    const marker = document.getElementById("nyanMarker");
-    const nyanCard = document.getElementById("nyanCard");
-    const rainbow = document.getElementById("rainbow");
+    const marker = document.getElementById("apeMarker");
+    const card = document.getElementById("apeCard");
+    const ball = document.getElementById("ball");
     const text = document.getElementById("text");
     const debugBox = document.getElementById("debugStatus");
 
-    let visible = false;
+    let seen = false;
     let clicked = false;
 
-    // 🔍 DEBUG — SEE WHEN MARKER IS FOUND
     marker.addEventListener('markerFound', () => {
-        console.log("FOUND");
-        visible = true;
-
+        seen = true;
         debugBox.style.background = "green";
         debugBox.textContent = "✅ Marker detected!";
-
-        text.setAttribute("value", "🌈 Nyan Cat Appears! Tap the screen ✨");
+        text.setAttribute("value", "🐒 Ape detected! Tap the screen!");
+        console.log("FOUND");
     });
 
-    // 🔍 DEBUG — SEE WHEN MARKER IS LOST
     marker.addEventListener('markerLost', () => {
-        console.log("LOST");
-        visible = false;
-
+        seen = false;
         debugBox.style.background = "red";
         debugBox.textContent = "❌ Marker NOT detected";
+        console.log("LOST");
     });
 
-    // Tap interaction
     document.body.addEventListener('click', () => {
-        if (!visible) return;
+        if (!seen) return;
 
         if (!clicked) {
-            rainbow.setAttribute("visible", true);
-            text.setAttribute("value", "💫 Nyan Cat activates rainbow trail!");
+            ball.setAttribute("visible", true);
+            text.setAttribute("value", "🔥 Magic ball ON!");
             clicked = true;
         } else {
-            rainbow.setAttribute("visible", false);
-            text.setAttribute("value", "🚀 Rainbow off. Tap again for magic!");
+            ball.setAttribute("visible", false);
+            text.setAttribute("value", "✨ Tap again for magic!");
             clicked = false;
         }
     });

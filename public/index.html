@@ -8,117 +8,162 @@
     <!-- A-Frame -->
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-    <!-- AR.js NFT -->
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    <!-- AR.js -->
+    <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/ar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/aframe/aframe-ar.js"></script>
 
     <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
         #debugStatus {
             position: fixed;
             bottom: 15px;
             left: 15px;
             padding: 10px 14px;
-            font-size: 15px;
-            background: red;
+            font-size: 13px;
+            background: rgba(0, 0, 0, 0.7);
             color: white;
             border-radius: 6px;
             z-index: 9999;
+            font-family: monospace;
+        }
+
+        #tapHint {
+            position: fixed;
+            bottom: 50px;
+            left: 15px;
+            padding: 8px 12px;
+            font-size: 12px;
+            background: rgba(100, 150, 255, 0.8);
+            color: white;
+            border-radius: 4px;
+            z-index: 9999;
+            display: none;
             font-family: sans-serif;
         }
     </style>
 </head>
 
-<body>
+<body style="margin: 0; overflow: hidden;">
 
-<div id="debugStatus">❌ Marker NOT detected</div>
+<div id="debugStatus">❌ Loading...</div>
+<div id="tapHint">👆 Tap the portal!</div>
 
 <a-scene
         embedded
         arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false;"
-        renderer="logarithmicDepthBuffer: true">
+        renderer="logarithmicDepthBuffer: true; antialias: true; alpha: true">
 
-    <!-- MAIN MARKER -->
+    <!-- Camera -->
+    <a-entity camera></a-entity>
+
+    <!-- Marker (using image tracking) -->
     <a-nft id="nyanMarker"
            type="nft"
-           url="./nyan-marker/nyan">
+           url="./nyan-marker/nyan"
+           scale="1 1 1">
 
-        <!-- OBJECT 1 – Nyan Cat (visible first) -->
-        <a-image id="nyanImage"
+        <!-- OBJECT 1 – Nyan Cat -->
+        <a-plane id="nyanImage"
                  src="./nyan.png"
-                 rotation="-90 0 0"
-                 width="1.2" height="1.2"
+                 position="0 0 0"
+                 rotation="0 0 0"
+                 width="1.2"
+                 height="1.2"
                  visible="false">
-        </a-image>
+        </a-plane>
 
-        <!-- OBJECT 2 – Portal (appears after nyan disappears) -->
+        <!-- OBJECT 2 – Portal -->
         <a-torus-knot id="portal"
                       radius="0.4"
                       radius-tubular="0.1"
-                      rotation="0 0 0"
                       position="0 0 0"
                       color="#FF00FF"
                       visible="false"
                       animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
         </a-torus-knot>
 
-        <!-- OBJECT 3 – Planet (appears after tapping portal) -->
+        <!-- OBJECT 3 – Planet -->
         <a-sphere id="planet"
                   radius="0.5"
                   color="#4CC3D9"
                   visible="false"
-                  rotation="0 0 0"
                   animation="property: rotation; to: 0 360 0; loop: true; dur: 4000">
         </a-sphere>
 
     </a-nft>
 
-    <a-entity camera></a-entity>
 </a-scene>
 
 <script>
     const marker = document.getElementById("nyanMarker");
     const dbg = document.getElementById("debugStatus");
+    const tapHint = document.getElementById("tapHint");
 
     const nyan = document.getElementById("nyanImage");
     const portal = document.getElementById("portal");
     const planet = document.getElementById("planet");
 
     let stage = 0; // 0 = nothing, 1 = nyan shown, 2 = portal, 3 = planet
+    let markerFound = false;
 
-    // Marker found
+    // When marker is detected
     marker.addEventListener("markerFound", () => {
-        dbg.style.background = "green";
+        markerFound = true;
+        dbg.style.background = "rgba(0, 150, 0, 0.8)";
         dbg.textContent = "✅ Marker detected!";
 
         if (stage === 0) {
             stage = 1;
             nyan.setAttribute("visible", true);
 
-            // After 3 seconds → show portal
+            // After 3 seconds: show portal, hide nyan
             setTimeout(() => {
-                if (stage === 1) {
+                if (stage === 1 && markerFound) {
                     nyan.setAttribute("visible", false);
                     portal.setAttribute("visible", true);
                     stage = 2;
+                    tapHint.style.display = "block";
+                    dbg.textContent = "✅ Marker detected! → Portal";
                 }
             }, 3000);
         }
     });
 
-    // Marker lost
+    // When marker is lost
     marker.addEventListener("markerLost", () => {
-        dbg.style.background = "red";
-        dbg.textContent = "❌ Marker NOT detected";
+        markerFound = false;
+        dbg.style.background = "rgba(150, 0, 0, 0.8)";
+        dbg.textContent = "❌ Marker lost";
+        tapHint.style.display = "none";
     });
 
-    // Tap portal → show planet
+    // Click/tap to advance
     document.body.addEventListener("click", () => {
-        if (stage === 2) {
+        if (stage === 2 && markerFound) {
             portal.setAttribute("visible", false);
             planet.setAttribute("visible", true);
             stage = 3;
+            tapHint.style.display = "none";
+            dbg.textContent = "✅ Marker detected! → Planet";
         }
     });
 
+    // Log AR.js status
+    window.addEventListener("load", () => {
+        setTimeout(() => {
+            if (stage === 0) {
+                dbg.textContent = "📷 Waiting for marker...";
+            }
+        }, 2000);
+    });
 </script>
 
 </body>

@@ -1,124 +1,29 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title>Ape AR NFT Experience</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-
-    <!-- A-Frame -->
-    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-    <!-- AR.js NFT -->
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
-
-    <style>
-        body { margin:0; overflow:hidden; font-family: system-ui; }
-
-        #debugStatus {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            background: red;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            z-index: 999;
-        }
-    </style>
+<meta charset="utf-8"/>
+<title>Nyan Cat AR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+<style>
+#debugStatus{position:fixed;bottom:10px;left:10px;background:red;color:white;padding:8px 12px;font-size:14px;z-index:999;}
+</style>
 </head>
-
 <body>
-
 <div id="debugStatus">❌ Marker NOT detected</div>
-
-<a-scene
-        embedded
-        vr-mode-ui="enabled: false"
-        renderer="colorManagement: true; physicallyCorrectLights: true"
-        arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false"
->
-
-    <a-entity light="type: ambient; intensity: 1"></a-entity>
-    <a-entity light="type: directional; intensity: 0.9" position="1 1 1"></a-entity>
-
-    <!-- NFT marker for the ape -->
-    <a-nft
-            id="apeMarker"
-            type="nft"
-            url="./ape-marker/ape">
-
-        <a-plane
-                id="apeCard"
-                position="0 0 0"
-                rotation="-90 0 0"
-                width="1.2"
-                height="1.2"
-                material="src: url(public/ape.png); transparent: true; opacity: 1;">
-        </a-plane>
-
-        <a-text id="text"
-                value="✨ Scan the Ape NFT!"
-                color="#ffffff"
-                align="center"
-                width="2"
-                position="0 0.9 0"
-                rotation="-90 0 0">
-        </a-text>
-
-        <a-sphere id="ball"
-                  visible="false"
-                  radius="0.15"
-                  position="0 0.5 0.2"
-                  material="color: #ff0066; emissive: #ff3385; transparent: true; opacity: 0.9"
-                  animation="property: position; to: 0 0.9 0.2; dir: alternate; loop: true; dur: 1000">
-        </a-sphere>
-
-    </a-nft>
-
-    <a-entity camera></a-entity>
-
+<a-scene embedded arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled:false">
+<a-nft id="marker" type="nft" url="./nyan-marker/nyan">
+  <a-plane rotation="-90 0 0" width="1" height="1"
+           material="src: url(./nyan.png); transparent:true; opacity:1"></a-plane>
+</a-nft>
+<a-entity camera></a-entity>
 </a-scene>
-
 <script>
-    const marker = document.getElementById("apeMarker");
-    const card = document.getElementById("apeCard");
-    const ball = document.getElementById("ball");
-    const text = document.getElementById("text");
-    const debugBox = document.getElementById("debugStatus");
-
-    let seen = false;
-    let clicked = false;
-
-    marker.addEventListener('markerFound', () => {
-        seen = true;
-        debugBox.style.background = "green";
-        debugBox.textContent = "✅ Marker detected!";
-        text.setAttribute("value", "🐒 Ape detected! Tap the screen!");
-        console.log("FOUND");
-    });
-
-    marker.addEventListener('markerLost', () => {
-        seen = false;
-        debugBox.style.background = "red";
-        debugBox.textContent = "❌ Marker NOT detected";
-        console.log("LOST");
-    });
-
-    document.body.addEventListener('click', () => {
-        if (!seen) return;
-
-        if (!clicked) {
-            ball.setAttribute("visible", true);
-            text.setAttribute("value", "🔥 Magic ball ON!");
-            clicked = true;
-        } else {
-            ball.setAttribute("visible", false);
-            text.setAttribute("value", "✨ Tap again for magic!");
-            clicked = false;
-        }
-    });
+const m=document.getElementById('marker');
+const dbg=document.getElementById('debugStatus');
+m.addEventListener('markerFound',()=>{dbg.style.background='green';dbg.textContent='✅ Marker detected!';});
+m.addEventListener('markerLost',()=>{dbg.style.background='red';dbg.textContent='❌ Marker NOT detected';});
 </script>
-
 </body>
 </html>

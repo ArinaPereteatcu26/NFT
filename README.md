@@ -17,7 +17,7 @@ Nyan Cat appears above the marker as soon as it is detected.
 
 *Step 2 — Floating Stars*
 Soft glowing stars orbit around Nyan Cat, symbolizing cosmic energy.
-<img width="591" height="1280" alt="image" src="https://github.com/user-attachments/assets/b4e6a4ed-25ad-4646-a751-f2067890da7f" />
+<img width="300" height="600" alt="image" src="https://github.com/user-attachments/assets/b4e6a4ed-25ad-4646-a751-f2067890da7f" />
 
 
 *Step 3 — Planet Formation*

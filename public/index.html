@@ -26,6 +26,76 @@
             font-size: 1.25em;
             color: white;
         }
+
+        #storyBox {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 15px;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            text-align: center;
+            max-width: 80%;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #storyBox.visible {
+            opacity: 1;
+        }
+
+        #tapHint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border-radius: 20px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #tapHint.visible {
+            opacity: 1;
+        }
+
+        #stepIndicator {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #stepIndicator.visible {
+            opacity: 1;
+        }
+
+        .step-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transition: background 0.3s ease;
+        }
+
+        .step-dot.active {
+            background: #00ff88;
+        }
     </style>
 </head>
 
@@ -34,6 +104,16 @@
 <div class="arjs-loader">
     <div>Loading, please wait...</div>
 </div>
+
+<!-- Story UI -->
+<div id="storyBox"></div>
+<div id="stepIndicator">
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+</div>
+<div id="tapHint">Tap to continue</div>
 
 <a-scene
         vr-mode-ui="enabled: false;"
@@ -64,6 +144,63 @@
 
     <a-entity camera></a-entity>
 </a-scene>
+
+<script>
+    const storySteps = [
+        "Welcome! Point your camera at the image...",
+        "Nyan Cat awakens from the digital realm!",
+        "Flying through space on a rainbow trail...",
+        "The journey continues... thanks for watching!"
+    ];
+
+    let currentStep = 0;
+    let markerFound = false;
+
+    const storyBox = document.getElementById('storyBox');
+    const stepIndicator = document.getElementById('stepIndicator');
+    const tapHint = document.getElementById('tapHint');
+    const dots = document.querySelectorAll('.step-dot');
+
+    function showStep(index) {
+        if (index >= storySteps.length) return;
+        currentStep = index;
+        storyBox.textContent = storySteps[index];
+        storyBox.classList.add('visible');
+        stepIndicator.classList.add('visible');
+
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i <= index);
+        });
+
+        if (index < storySteps.length - 1) {
+            setTimeout(() => tapHint.classList.add('visible'), 1500);
+        } else {
+            tapHint.classList.remove('visible');
+        }
+    }
+
+    function nextStep() {
+        if (currentStep < storySteps.length - 1) {
+            tapHint.classList.remove('visible');
+            showStep(currentStep + 1);
+        }
+    }
+
+    // Start story when marker is found
+    document.querySelector('a-nft').addEventListener('markerFound', () => {
+        if (!markerFound) {
+            markerFound = true;
+            showStep(0);
+            setTimeout(() => showStep(1), 2000);
+        }
+    });
+
+    // Tap to advance story
+    document.body.addEventListener('click', () => {
+        if (markerFound && currentStep >= 1) {
+            nextStep();
+        }
+    });
+</script>
 </body>
 </html>
-

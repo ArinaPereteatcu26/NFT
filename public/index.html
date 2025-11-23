@@ -112,6 +112,7 @@
     <div class="step-dot"></div>
     <div class="step-dot"></div>
     <div class="step-dot"></div>
+    <div class="step-dot"></div>
 </div>
 <div id="tapHint">Tap to continue</div>
 
@@ -133,13 +134,58 @@
             smoothTolerance=".01"
             smoothThreshold="5"
     >
-        <!-- Your nyan image displayed on the T-rex marker -->
-        <a-image
-                src="#nyanImg"
-                position="50 150 0"
-                rotation="-90 0 0"
-                scale="100 100 100"
-        ></a-image>
+        <!-- Step 1: Nyan Cat image -->
+        <a-entity id="step1" visible="true">
+            <a-image
+                    src="#nyanImg"
+                    position="50 150 0"
+                    rotation="-90 0 0"
+                    scale="100 100 100"
+            ></a-image>
+        </a-entity>
+        <!-- Step 2: Rainbow with spinning torus -->
+        <a-entity id="step2" visible="false">
+            <a-box position="0 100 0" width="20" height="10" depth="150" color="#FF0000" rotation="-90 0 0"></a-box>
+            <a-box position="0 100 15" width="20" height="10" depth="150" color="#FF7F00" rotation="-90 0 0"></a-box>
+            <a-box position="0 100 30" width="20" height="10" depth="150" color="#FFFF00" rotation="-90 0 0"></a-box>
+            <a-box position="0 100 45" width="20" height="10" depth="150" color="#00FF00" rotation="-90 0 0"></a-box>
+            <a-box position="0 100 60" width="20" height="10" depth="150" color="#0000FF" rotation="-90 0 0"></a-box>
+            <a-box position="0 100 75" width="20" height="10" depth="150" color="#8B00FF" rotation="-90 0 0"></a-box>
+            <a-torus position="100 150 40" radius="40" radius-tubular="8" color="#FF69B4"
+                     animation="property: rotation; to: 360 360 0; loop: true; dur: 3000; easing: linear">
+            </a-torus>
+        </a-entity>
+
+        <!-- Step 3: Space scene with planet -->
+        <a-entity id="step3" visible="false">
+            <a-sphere position="50 150 0" radius="60" color="#4169E1"
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear">
+            </a-sphere>
+            <a-torus position="50 150 0" radius="90" radius-tubular="5" color="#FFD700" rotation="60 0 0"
+                     animation="property: rotation; from: 60 0 0; to: 60 360 0; loop: true; dur: 6000; easing: linear">
+            </a-torus>
+            <a-sphere position="120 180 30" radius="15" color="#FFFFFF"></a-sphere>
+            <a-sphere position="-20 120 -20" radius="10" color="#FFA500"></a-sphere>
+        </a-entity>
+
+        <!-- Step 4: Celebration with fireworks -->
+        <a-entity id="step4" visible="false">
+            <a-image
+                    src="#nyanImg"
+                    position="50 150 0"
+                    rotation="-90 0 0"
+                    scale="120 120 120"
+                    animation="property: rotation; from: -90 -5 0; to: -90 5 0; loop: true; dur: 300; dir: alternate">
+            </a-image>
+            <a-sphere position="120 200 30" radius="15" color="#FF0080"
+                      animation="property: scale; from: 0.5 0.5 0.5; to: 1.5 1.5 1.5; loop: true; dur: 500; dir: alternate"></a-sphere>
+            <a-sphere position="-20 180 40" radius="12" color="#00FFFF"
+                      animation="property: scale; from: 0.5 0.5 0.5; to: 1.5 1.5 1.5; loop: true; dur: 600; dir: alternate"></a-sphere>
+            <a-sphere position="80 220 -20" radius="18" color="#FFFF00"
+                      animation="property: scale; from: 0.5 0.5 0.5; to: 1.5 1.5 1.5; loop: true; dur: 400; dir: alternate"></a-sphere>
+            <a-sphere position="20 200 50" radius="10" color="#00FF00"
+                      animation="property: scale; from: 0.5 0.5 0.5; to: 1.5 1.5 1.5; loop: true; dur: 550; dir: alternate"></a-sphere>
+        </a-entity>
     </a-nft>
 
     <a-entity camera></a-entity>
@@ -150,7 +196,8 @@
         "Welcome! Point your camera at the image...",
         "Nyan Cat awakens from the digital realm!",
         "Flying through space on a rainbow trail...",
-        "The journey continues... thanks for watching!"
+        "A mysterious planet appears in the cosmos...",
+        "Celebration time! Thanks for the journey!"
     ];
 
     let currentStep = 0;
@@ -161,15 +208,31 @@
     const tapHint = document.getElementById('tapHint');
     const dots = document.querySelectorAll('.step-dot');
 
+    const stepEntities = [
+        null, // step 0 has no 3D content
+        document.getElementById('step1'),
+        document.getElementById('step2'),
+        document.getElementById('step3'),
+        document.getElementById('step4')
+    ];
+
     function showStep(index) {
         if (index >= storySteps.length) return;
+
         currentStep = index;
         storyBox.textContent = storySteps[index];
         storyBox.classList.add('visible');
         stepIndicator.classList.add('visible');
 
+        // Update dots
         dots.forEach((dot, i) => {
             dot.classList.toggle('active', i <= index);
+        });
+// Show/hide 3D entities
+        stepEntities.forEach((entity, i) => {
+            if (entity) {
+                entity.setAttribute('visible', i === index);
+            }
         });
 
         if (index < storySteps.length - 1) {

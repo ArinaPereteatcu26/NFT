@@ -12,7 +12,7 @@ The project uses a custom NFT marker generated with the AR.js NFT tool.
 
 *Step 1 — Awakening*
 Nyan Cat appears above the marker as soon as it is detected.
-<img width="300" height="400" alt="image" src="https://github.com/user-attachments/assets/fd116483-469c-45a1-96ec-b00dd6f09f0a" />
+<img width="300" height="600" alt="image" src="https://github.com/user-attachments/assets/fd116483-469c-45a1-96ec-b00dd6f09f0a" />
 
 
 *Step 2 — Floating Stars*

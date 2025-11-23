@@ -131,26 +131,28 @@
             </a-image>
         </a-entity>
 
-        <!-- STEP 2: Rainbow & spinning torus -->
+        <!-- Step 2: Pixel Portal (Cute 8-bit style) -->
         <a-entity id="step2" visible="false">
-            <a-box color="#FF0000" width="20" height="10" depth="150"
-                   position="0 120 0" rotation="-90 0 0"></a-box>
-            <a-box color="#FF7F00" width="20" height="10" depth="150"
-                   position="0 120 15" rotation="-90 0 0"></a-box>
-            <a-box color="#FFFF00" width="20" height="10" depth="150"
-                   position="0 120 30" rotation="-90 0 0"></a-box>
-            <a-box color="#00FF00" width="20" height="10" depth="150"
-                   position="0 120 45" rotation="-90 0 0"></a-box>
-            <a-box color="#0000FF" width="20" height="10" depth="150"
-                   position="0 120 60" rotation="-90 0 0"></a-box>
-            <a-box color="#8B00FF" width="20" height="10" depth="150"
-                   position="0 120 75" rotation="-90 0 0"></a-box>
 
-            <a-torus color="#FF69B4"
-                     radius="50" radius-tubular="8"
-                     position="80 150 40"
-                     animation="property:rotation; to:360 360 0; loop:true; dur:3000;">
-            </a-torus>
+            <!-- Outer glow halo -->
+            <a-image
+                    src="./portal-glow.png"
+                    position="50 150 0"
+                    rotation="-90 0 0"
+                    scale="150 150 150"
+                    opacity="0.9"
+                    animation="property: scale; from: 140 140 140; to: 160 160 160; loop: true; dur: 1500; dir: alternate; easing: easeInOutSine"
+            ></a-image>
+
+            <!-- Pixel-art ring -->
+            <a-image
+                    src="./portal-pixel.png"
+                    position="50 150 1"
+                    rotation="-90 0 0"
+                    scale="120 120 120"
+                    animation="property: rotation; to: -90 360 0; loop: true; dur: 4500; easing: linear"
+            ></a-image>
+
         </a-entity>
 
         <!-- STEP 3: Planet, ring, space objects -->

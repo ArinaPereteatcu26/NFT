@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Zorg AR NFT Experience</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <!-- AR.js NFT -->
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+
+    <style>
+        body { margin:0; overflow:hidden; }
+    </style>
+</head>
+
+<body>
+<a-scene
+        embedded
+        vr-mode-ui="enabled: false"
+        renderer="colorManagement: true; physicallyCorrectLights: true"
+        arjs="sourceType: webcam; debugUIEnabled: false"
+>
+
+    <!-- Lights -->
+    <a-entity light="type: ambient; intensity: 1"></a-entity>
+    <a-entity light="type: directional; intensity: 0.9" position="1 1 1"></a-entity>
+
+    <!-- NFT Marker -->
+    <a-nft type="nft" url="./alien" id="marker">
+
+        <!-- Hologram image (your uploaded alien image) -->
+        <a-plane
+                id="alienHolo"
+                position="0 0 0"
+                rotation="-90 0 0"
+                width="1.2"
+                height="1.2"
+                material="src: url(./alien.jpg);
+                      opacity: 0.85;
+                      transparent: true;
+                      shader: standard;
+                      emissive: #33FFEE;
+                      emissiveIntensity: 0.5;">
+        </a-plane>
+
+        <!-- Text that changes when clicked -->
+        <a-text id="alienText"
+                value="👽 Zorg has arrived.\nTouch for messages."
+                color="#00FFAA"
+                align="center"
+                position="0 0.8 0.1"
+                rotation="-90 0 0"
+                width="2"
+                animation="property: material.color; from: #00FFAA; to: #FF5DFD; dur: 2500; loop: true; dir: alternate">
+        </a-text>
+
+        <!-- Smoke particle effect -->
+        <a-entity id="smoke"
+                  visible="false"
+                  particle-system="
+                preset: dust;
+                color: #FF00FF, #AA00FF;
+                size: 0.3;
+                particleCount: 150;
+                opacity: 0.6;
+                positionSpread: 0.5 0.5 0.5;
+                velocityValue: 0 1 0;">
+        </a-entity>
+
+        <!-- Portal -->
+        <a-torus-knot id="portal"
+                      visible="false"
+                      radius="0.4"
+                      radius-tubular="0.1"
+                      position="0 -0.4 0.3"
+                      material="color: #FF00FF; emissive: #5500FF; opacity: 0.7; transparent: true"
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
+        </a-torus-knot>
+
+    </a-nft>
+
+    <!-- Camera -->
+    <a-entity camera></a-entity>
+</a-scene>
+
+<script>
+    const text = document.getElementById("alienText");
+    const smoke = document.getElementById("smoke");
+    const portal = document.getElementById("portal");
+
+    const messages = [
+        "👽 Zorg: Welcome, earth traveler.",
+        "💨 I breathe cosmic smoke from stars.",
+        "🌌 Touch me again to open the portal.",
+        "🚀 The universe is bigger than your worries.",
+        "✨ Stay high in vibration, not substances."
+    ];
+
+    let index = 0;
+    let stage = 0;
+
+    document.body.addEventListener('click', () => {
+
+        if (stage === 0) {
+            index = (index + 1) % messages.length;
+            text.setAttribute('value', messages[index]);
+
+            if (index === 2) stage = 1;
+        }
+        else if (stage === 1) {
+            smoke.setAttribute('visible', true);
+            text.setAttribute('value',
+                "💨 Zorg exhales cosmic smoke...\nTap again to open a portal.");
+            stage = 2;
+        }
+        else if (stage === 2) {
+            portal.setAttribute('visible', true);
+            text.setAttribute('value',
+                "🌀 Portal activated.\nStep into the unknown.");
+            stage = 3;
+        }
+    });
+</script>
+
+</body>
+</html>

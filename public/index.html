@@ -1,51 +1,73 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <title>Nyan Cat AR</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta charset="utf-8" />
+    <title>Nyan Cat AR Story</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
-    <!-- A-Frame (version that works well with AR.js NFT) -->
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-    <!-- AR.js NFT build (IMPORTANT: -nft version) -->
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar-nft.js"></script>
+    <!-- AR.js NFT -->
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
 
     <style>
-        body { margin:0; overflow:hidden; }
-        #debugStatus{
-            position:fixed;
-            bottom:10px;
-            left:10px;
-            background:red;
-            color:white;
-            padding:8px 12px;
-            font-size:14px;
-            z-index:999;
-            font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+        #debugStatus {
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            padding: 10px 14px;
+            font-size: 15px;
+            background: red;
+            color: white;
+            border-radius: 6px;
+            z-index: 9999;
+            font-family: sans-serif;
         }
     </style>
 </head>
+
 <body>
+
 <div id="debugStatus">❌ Marker NOT detected</div>
 
 <a-scene
         embedded
-        vr-mode-ui="enabled: false"
-        renderer="colorManagement: true; physicallyCorrectLights: true"
-        arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false">
+        arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false;"
+        renderer="logarithmicDepthBuffer: true">
 
-    <a-nft
-            id="marker"
-            type="nft"
-            url="./nyan-marker/nyan">
+    <!-- MAIN MARKER -->
+    <a-nft id="nyanMarker"
+           type="nft"
+           url="./nyan-marker/nyan">
 
-        <a-plane
-                rotation="-90 0 0"
-                width="1"
-                height="1"
-                material="src: url(./nyan.png); transparent: true; opacity: 1">
-        </a-plane>
+        <!-- OBJECT 1 – Nyan Cat (visible first) -->
+        <a-image id="nyanImage"
+                 src="./nyan.png"
+                 rotation="-90 0 0"
+                 width="1.2" height="1.2"
+                 visible="false">
+        </a-image>
+
+        <!-- OBJECT 2 – Portal (appears after nyan disappears) -->
+        <a-torus-knot id="portal"
+                      radius="0.4"
+                      radius-tubular="0.1"
+                      rotation="0 0 0"
+                      position="0 0 0"
+                      color="#FF00FF"
+                      visible="false"
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
+        </a-torus-knot>
+
+        <!-- OBJECT 3 – Planet (appears after tapping portal) -->
+        <a-sphere id="planet"
+                  radius="0.5"
+                  color="#4CC3D9"
+                  visible="false"
+                  rotation="0 0 0"
+                  animation="property: rotation; to: 0 360 0; loop: true; dur: 4000">
+        </a-sphere>
 
     </a-nft>
 
@@ -53,18 +75,51 @@
 </a-scene>
 
 <script>
-    const marker = document.getElementById('marker');
-    const dbg = document.getElementById('debugStatus');
+    const marker = document.getElementById("nyanMarker");
+    const dbg = document.getElementById("debugStatus");
 
-    marker.addEventListener('markerFound', () => {
-        dbg.style.background = 'green';
-        dbg.textContent = '✅ Marker detected!';
+    const nyan = document.getElementById("nyanImage");
+    const portal = document.getElementById("portal");
+    const planet = document.getElementById("planet");
+
+    let stage = 0; // 0 = nothing, 1 = nyan shown, 2 = portal, 3 = planet
+
+    // Marker found
+    marker.addEventListener("markerFound", () => {
+        dbg.style.background = "green";
+        dbg.textContent = "✅ Marker detected!";
+
+        if (stage === 0) {
+            stage = 1;
+            nyan.setAttribute("visible", true);
+
+            // After 3 seconds → show portal
+            setTimeout(() => {
+                if (stage === 1) {
+                    nyan.setAttribute("visible", false);
+                    portal.setAttribute("visible", true);
+                    stage = 2;
+                }
+            }, 3000);
+        }
     });
 
-    marker.addEventListener('markerLost', () => {
-        dbg.style.background = 'red';
-        dbg.textContent = '❌ Marker NOT detected';
+    // Marker lost
+    marker.addEventListener("markerLost", () => {
+        dbg.style.background = "red";
+        dbg.textContent = "❌ Marker NOT detected";
     });
+
+    // Tap portal → show planet
+    document.body.addEventListener("click", () => {
+        if (stage === 2) {
+            portal.setAttribute("visible", false);
+            planet.setAttribute("visible", true);
+            stage = 3;
+        }
+    });
+
 </script>
+
 </body>
 </html>
